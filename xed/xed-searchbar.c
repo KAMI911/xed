@@ -328,7 +328,9 @@ install_occurrence_count_idle (XedSearchbar *searchbar)
 {
     if (searchbar->priv->update_occurrence_count_id == 0)
     {
-        searchbar->priv->update_occurrence_count_id = g_idle_add ((GSourceFunc)update_occurrence_count_id_cb, searchbar);
+        /* Use a short timeout instead of g_idle_add to debounce rapid
+         * cursor movements and avoid recomputing on every keystroke. */
+        searchbar->priv->update_occurrence_count_id = g_timeout_add (150, (GSourceFunc)update_occurrence_count_id_cb, searchbar);
     }
 }
 
