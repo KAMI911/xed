@@ -639,12 +639,15 @@ build_multiple_docs_dialog (XedCloseConfirmationDialog *dlg)
     gtk_widget_set_halign (primary_label, GTK_ALIGN_START);
     gtk_label_set_selectable (GTK_LABEL (primary_label), TRUE);
 
-    str = g_strdup_printf (ngettext ("There is %d document with unsaved changes. "
-                                     "Save changes before closing?",
-                                     "There are %d documents with unsaved changes. "
-                                     "Save changes before closing?",
-                                     g_list_length (priv->unsaved_documents)),
-                                     g_list_length (priv->unsaved_documents));
+    {
+        guint n_unsaved = g_list_length (priv->unsaved_documents);
+        str = g_strdup_printf (ngettext ("There is %d document with unsaved changes. "
+                                         "Save changes before closing?",
+                                         "There are %d documents with unsaved changes. "
+                                         "Save changes before closing?",
+                                         n_unsaved),
+                                         n_unsaved);
+    }
 
     markup_str = g_strconcat ("<span weight=\"bold\" size=\"larger\">", str, "</span>", NULL);
     g_free (str);

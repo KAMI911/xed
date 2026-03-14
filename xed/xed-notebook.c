@@ -762,11 +762,12 @@ xed_notebook_change_current_page (GtkNotebook *notebook,
 
         if (wrap_around)
         {
+            gint n_pages = gtk_notebook_get_n_pages (notebook);
             if (current < 0)
             {
-                current = gtk_notebook_get_n_pages (notebook) - 1;
+                current = n_pages - 1;
             }
-            else if (current >= gtk_notebook_get_n_pages (notebook))
+            else if (current >= n_pages)
             {
                 current = 0;
             }
