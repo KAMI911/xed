@@ -64,7 +64,18 @@ xed_gdk_color_to_string (GdkColor color)
 gint
 xed_string_to_clamped_gint (const gchar *text)
 {
-    long int long_line = strtol (text, NULL, 10);
+    gchar *end;
+    long int long_line;
+
+    if (text == NULL || *text == '\0')
+        return 0;
+
+    errno = 0;
+    long_line = strtol (text, &end, 10);
+
+    if (errno != 0 || end == text)
+        return 0;
+
     return CLAMP (long_line, INT_MIN, INT_MAX);
 }
 
@@ -251,22 +262,20 @@ xed_utils_escape_underscores (const gchar* text,
     p = text;
     end = text + length;
 
+    /* '_' is ASCII (0x5F) so it can never appear inside a multi-byte UTF-8
+     * sequence.  Scan with memchr to copy large runs in one shot instead of
+     * advancing character-by-character. */
     while (p != end)
     {
-        const gchar *next;
-        next = g_utf8_next_char (p);
-
-        switch (*p)
+        const gchar *underscore = memchr (p, '_', (gsize)(end - p));
+        if (underscore == NULL)
         {
-            case '_':
-                g_string_append (str, "__");
-                break;
-            default:
-                g_string_append_len (str, p, next - p);
-                break;
+            g_string_append_len (str, p, end - p);
+            break;
         }
-
-        p = next;
+        g_string_append_len (str, p, underscore - p);
+        g_string_append_len (str, "__", 2);
+        p = underscore + 1;
     }
 
     return g_string_free (str, FALSE);
@@ -1364,7 +1373,9 @@ _xed_utils_encoding_list_to_strv (const GSList *enc_list)
     GSList *l;
     GPtrArray *array;
 
-    array = g_ptr_array_sized_new (g_slist_length ((GSList *)enc_list) + 1);
+    /* Avoid a full O(n) pre-scan just for the initial capacity; the array
+     * will grow as needed and the list is typically short. */
+    array = g_ptr_array_new ();
 
     for (l = (GSList *)enc_list; l != NULL; l = g_slist_next (l))
     {

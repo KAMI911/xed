@@ -383,7 +383,7 @@ page_entry_activated (GtkEntry        *entry,
 
     text = gtk_entry_get_text (entry);
 
-    page = CLAMP (atoi (text), 1, preview->priv->n_pages) - 1;
+    page = CLAMP ((gint) g_ascii_strtoll (text, NULL, 10), 1, preview->priv->n_pages) - 1;
     goto_page (preview, page);
 
     gtk_widget_grab_focus (GTK_WIDGET (preview->priv->layout));
@@ -428,7 +428,7 @@ page_entry_focus_out (GtkWidget       *widget,
     gint page;
 
     text = gtk_entry_get_text (GTK_ENTRY (widget));
-    page = atoi (text) - 1;
+    page = (gint) g_ascii_strtoll (text, NULL, 10) - 1;
 
     /* Reset the page number only if really needed */
     if (page != preview->priv->cur_page)

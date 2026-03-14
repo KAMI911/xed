@@ -248,7 +248,8 @@ load_values (void)
         return TRUE;
     }
 
-    doc = xmlParseFile (xed_metadata_manager->metadata_filename);
+    /* Use xmlReadFile with XML_PARSE_NONET to prevent XXE via network access */
+    doc = xmlReadFile (xed_metadata_manager->metadata_filename, NULL, XML_PARSE_NONET);
 
     if (doc == NULL)
     {

@@ -597,7 +597,7 @@ static void
 get_line_position (const gchar *arg,
                    gint        *line)
 {
-    *line = atoi (arg);
+    *line = (gint) g_ascii_strtoll (arg, NULL, 10);
 }
 
 static gint

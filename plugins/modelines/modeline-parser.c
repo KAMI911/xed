@@ -305,7 +305,7 @@ parse_vim_modeline (gchar           *s,
 		else if (strcmp (key->str, "ts") == 0 ||
 			 strcmp (key->str, "tabstop") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 
 			if (intval)
 			{
@@ -316,7 +316,7 @@ parse_vim_modeline (gchar           *s,
 		else if (strcmp (key->str, "sw") == 0 ||
 			 strcmp (key->str, "shiftwidth") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 
 			if (intval)
 			{
@@ -332,7 +332,7 @@ parse_vim_modeline (gchar           *s,
 		}
 		else if (strcmp (key->str, "textwidth") == 0 || strcmp (key->str, "tw") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 
 			if (intval)
 			{
@@ -415,7 +415,7 @@ parse_emacs_modeline (gchar           *s,
 		}
 		else if (strcmp (key->str, "tab-width") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 
 			if (intval)
 			{
@@ -425,7 +425,7 @@ parse_emacs_modeline (gchar           *s,
 		}
 		else if (strcmp (key->str, "indent-offset") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 
 			if (intval)
 			{
@@ -513,7 +513,7 @@ parse_kate_modeline (gchar           *s,
 		}
 		else if (strcmp (key->str, "tab-width") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 
 			if (intval)
 			{
@@ -523,7 +523,7 @@ parse_kate_modeline (gchar           *s,
 		}
 		else if (strcmp (key->str, "indent-width") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 			if (intval) options->indent_width = intval;
 		}
 		else if (strcmp (key->str, "space-indent") == 0)
@@ -547,7 +547,7 @@ parse_kate_modeline (gchar           *s,
 		}
 		else if (strcmp (key->str, "word-wrap-column") == 0)
 		{
-			intval = atoi (value->str);
+			intval = (guint) g_ascii_strtoull (value->str, NULL, 10);
 
 			if (intval)
 			{

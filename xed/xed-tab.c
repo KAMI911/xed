@@ -1623,7 +1623,7 @@ goto_line (XedTab *tab)
 
         pos = xed_document_get_metadata (doc, XED_METADATA_ATTRIBUTE_POSITION);
 
-        offset = pos != NULL ? atoi (pos) : 0;
+        offset = pos != NULL ? (gint) g_ascii_strtoll (pos, NULL, 10) : 0;
         g_free (pos);
 
         gtk_text_buffer_get_iter_at_offset (GTK_TEXT_BUFFER (doc), &iter, MAX (0, offset));
@@ -2524,9 +2524,16 @@ get_print_settings (XedTab *tab)
     }
 
     name = xed_document_get_short_name_for_display (doc);
-    uri = g_strconcat ("file://",
-                       g_get_user_special_dir (G_USER_DIRECTORY_DOCUMENTS),
-                       "/", name, ".pdf", NULL);
+
+    /* g_get_user_special_dir() can return NULL if the XDG directory is
+     * not configured; fall back to the home directory in that case so
+     * that the g_strdup_printf below never receives a NULL segment. */
+    {
+        const gchar *docs_dir = g_get_user_special_dir (G_USER_DIRECTORY_DOCUMENTS);
+        if (docs_dir == NULL)
+            docs_dir = g_get_home_dir ();
+        uri = g_strdup_printf ("file://%s/%s.pdf", docs_dir, name);
+    }
 
     gtk_print_settings_set (settings, GTK_PRINT_SETTINGS_OUTPUT_URI, uri);
 
