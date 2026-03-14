@@ -896,7 +896,7 @@ update_recent_files_menu (XedWindow *window)
     i = 0;
     for (l = filtered_items; l != NULL; l = l->next)
     {
-        gchar *action_name;
+        gchar action_name[32];  /* "recent-info-" + up to 19 digits + NUL */
         const gchar *display_name;
         gchar *label;
         gchar *uri;
@@ -914,7 +914,7 @@ update_recent_files_menu (XedWindow *window)
 
         i++;
 
-        action_name = g_strdup_printf ("recent-info-%d", i);
+        g_snprintf (action_name, sizeof (action_name), "recent-info-%d", i);
 
         display_name = gtk_recent_info_get_display_name (info);
         label = xed_utils_escape_underscores (display_name, -1);
@@ -944,7 +944,6 @@ update_recent_files_menu (XedWindow *window)
         gtk_ui_manager_add_ui (p->manager, p->recents_menu_ui_id, "/MenuBar/FileMenu/FileRecentsMenu/FileRecentsPlaceholder",
                                action_name, action_name, GTK_UI_MANAGER_MENUITEM, FALSE);
 
-        g_free (action_name);
         g_free (label);
         g_free (tip);
     }
@@ -1319,11 +1318,12 @@ update_documents_list_menu (XedWindow *window)
     {
         GtkWidget *tab;
         GtkRadioAction *action;
-        gchar *action_name;
+        gchar action_name[24];  /* "Tab_" + up to 19 digits + NUL */
+        gchar accel_buf[8];     /* "<alt>N" + NUL */
+        const gchar *accel;
         gchar *tab_name;
         gchar *name;
         gchar *tip;
-        gchar *accel;
 
         tab = gtk_notebook_get_nth_page (GTK_NOTEBOOK(p->notebook), i);
 
@@ -1334,13 +1334,21 @@ update_documents_list_menu (XedWindow *window)
          * the problem is worked around, action with the same name always
          * get the same accel.
          */
-        action_name = g_strdup_printf ("Tab_%d", i);
+        g_snprintf (action_name, sizeof (action_name), "Tab_%d", i);
         tab_name = _xed_tab_get_name (XED_TAB(tab));
         name = xed_utils_escape_underscores (tab_name, -1);
         tip = get_menu_tip_for_tab (XED_TAB(tab));
 
         /* alt + 1, 2, 3... 0 to switch to the first ten tabs */
-        accel = (i < 10) ? g_strdup_printf ("<alt>%d", (i + 1) % 10) : NULL;
+        if (i < 10)
+        {
+            g_snprintf (accel_buf, sizeof (accel_buf), "<alt>%d", (i + 1) % 10);
+            accel = accel_buf;
+        }
+        else
+        {
+            accel = NULL;
+        }
 
         action = gtk_radio_action_new (action_name, name, tip, NULL, i);
 
@@ -1366,11 +1374,9 @@ update_documents_list_menu (XedWindow *window)
 
         g_object_unref (action);
 
-        g_free (action_name);
         g_free (tab_name);
         g_free (name);
         g_free (tip);
-        g_free (accel);
     }
 
     p->documents_list_menu_ui_id = id;
@@ -1791,18 +1797,22 @@ update_cursor_position_statusbar (GtkTextBuffer *buffer,
 
     tab_size = gtk_source_view_get_tab_width (GTK_SOURCE_VIEW(view));
 
-    while (!gtk_text_iter_equal (&start, &iter))
+    /* Fetch the line slice once as a plain C string and walk it directly.
+     * This is significantly faster than calling gtk_text_iter_get_char() and
+     * gtk_text_iter_forward_char() for every character, because it avoids
+     * repeated GObject vtable dispatch through the text-buffer internals. */
     {
-        /* FIXME: Are we Unicode compliant here? */
-        if (gtk_text_iter_get_char (&start) == '\t')
+        gchar *line_text = gtk_text_buffer_get_text (buffer, &start, &iter, FALSE);
+        const gchar *p = line_text;
+        while (*p != '\0')
         {
-            col += (tab_size - (col % tab_size));
+            if (*p == '\t')
+                col += (tab_size - (col % tab_size));
+            else
+                ++col;
+            p = g_utf8_next_char (p);
         }
-        else
-        {
-            ++col;
-        }
-        gtk_text_iter_forward_char (&start);
+        g_free (line_text);
     }
 
     xed_statusbar_set_cursor_position (XED_STATUSBAR(window->priv->statusbar), row + 1, col + 1);

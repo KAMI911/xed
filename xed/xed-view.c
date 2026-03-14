@@ -785,11 +785,7 @@ xed_view_duplicate (XedView *view)
         if (gtk_text_buffer_get_line_count (buffer) > 1)
         {
             gtk_text_iter_assign (&end, &start);
-            while (gtk_text_iter_get_char (&end) != '\n' &&
-                    !gtk_text_iter_is_end (&end))
-            {
-                gtk_text_iter_forward_char (&end);
-            }
+            gtk_text_iter_forward_to_line_end (&end);
         }
     }
 
