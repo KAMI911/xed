@@ -625,11 +625,11 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox" id="box6">
+                      <object class="GtkBox" id="box31">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkLabel" id="label2">
+                          <object class="GtkLabel" id="label30">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Disable syntax highlighting for files larger than (MB, 0 = no limit)</property>
