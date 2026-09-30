@@ -277,7 +277,7 @@ xed_window_window_state_event (GtkWidget           *widget,
     window->priv->window_state = event->new_window_state;
     g_settings_set_int (window->priv->window_settings, XED_SETTINGS_WINDOW_STATE, window->priv->window_state);
 
-    return FALSE;
+    return GTK_WIDGET_CLASS (xed_window_parent_class)->window_state_event (widget, event);
 }
 
 static gboolean

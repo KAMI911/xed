@@ -1,3 +1,11 @@
+xed (3.9.0) adrien; urgency=medium
+
+  [ Michael Webster ]
+  * .github/workflows: Add generate-test-packages trigger.
+  * xed-window.c: Chain up window_state_event.
+
+ -- Clement Lefebvre <root@linuxmint.com>  Mon, 21 Sep 2026 18:36:33 +0100
+
 xed (3.8.9) zena; urgency=medium
 
   * l10n: Update translations
