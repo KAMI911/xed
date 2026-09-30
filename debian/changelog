@@ -5,7 +5,7 @@ xed (3.9.1) adrien; urgency=medium
   * xed-window.c: guard cursor-position status bar column calculation
     against a NULL text slice.
 
- -- Kálmán „KAMI” Szalai <kami911gmail.com>  Wed, 30 Sep 2026 18:02:11 +0200
+ -- Kálmán „KAMI” Szalai <kami911@gmail.com>  Wed, 30 Sep 2026 18:02:11 +0200
 
 xed (3.9.0) adrien; urgency=medium
 
