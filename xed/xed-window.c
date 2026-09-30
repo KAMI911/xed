@@ -1803,16 +1803,19 @@ update_cursor_position_statusbar (GtkTextBuffer *buffer,
      * repeated GObject vtable dispatch through the text-buffer internals. */
     {
         gchar *line_text = gtk_text_buffer_get_text (buffer, &start, &iter, FALSE);
-        const gchar *p = line_text;
-        while (*p != '\0')
+        if (line_text != NULL)
         {
-            if (*p == '\t')
-                col += (tab_size - (col % tab_size));
-            else
-                ++col;
-            p = g_utf8_next_char (p);
+            const gchar *p = line_text;
+            while (*p != '\0')
+            {
+                if (*p == '\t')
+                    col += (tab_size - (col % tab_size));
+                else
+                    ++col;
+                p = g_utf8_next_char (p);
+            }
+            g_free (line_text);
         }
-        g_free (line_text);
     }
 
     xed_statusbar_set_cursor_position (XED_STATUSBAR(window->priv->statusbar), row + 1, col + 1);

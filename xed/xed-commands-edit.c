@@ -236,20 +236,21 @@ _xed_cmd_edit_toggle_comment (GtkAction *action,
     {
         GtkTextIter start_line_iter;
         GtkTextIter end_line_iter;
-        const gchar *line_text;
+        gchar *line_text;
 
         gtk_text_buffer_get_iter_at_line (GTK_TEXT_BUFFER (active_document), &start_line_iter, i);
         end_line_iter = start_line_iter;
         gtk_text_iter_forward_to_line_end (&end_line_iter);
 
         line_text = gtk_text_buffer_get_slice (GTK_TEXT_BUFFER (active_document), &start_line_iter, &end_line_iter, TRUE);
-        if (g_str_has_prefix (line_text, comment_text))
+        if (line_text != NULL && g_str_has_prefix (line_text, comment_text))
         {
             is_comment = TRUE;
             end_line_iter = start_line_iter;
             gtk_text_iter_forward_chars (&end_line_iter, strlen(comment_text));
             gtk_text_buffer_delete (GTK_TEXT_BUFFER (active_document), &start_line_iter, &end_line_iter);
         }
+        g_free ((gchar *) line_text);
     }
 
     // only comment if nothing was commented to begin with
@@ -309,6 +310,11 @@ _xed_cmd_edit_toggle_comment_block (GtkAction *action,
     gtk_text_buffer_get_selection_bounds (GTK_TEXT_BUFFER (active_document), &start_iter, &end_iter);
 
     selected_text = gtk_text_buffer_get_slice (GTK_TEXT_BUFFER (active_document), &start_iter, &end_iter, TRUE);
+
+    if (selected_text == NULL)
+    {
+        return;
+    }
 
     if (g_str_has_prefix (selected_text, start_text) && g_str_has_suffix (selected_text, end_text))
     {
